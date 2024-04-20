@@ -57,6 +57,7 @@ class RadarChartData extends BaseChartData with EquatableMixin {
   /// for changing the ticks color and border width you can use [tickBorderData].
   ///
   /// You can modify [radarTouchData] to customize touch behaviors and responses.
+  /// You can provide a specific minimum and maximum range for your chart.
   RadarChartData({
     @required List<RadarDataSet>? dataSets,
     Color? radarBackgroundColor,
@@ -70,6 +71,8 @@ class RadarChartData extends BaseChartData with EquatableMixin {
     BorderSide? tickBorderData,
     BorderSide? gridBorderData,
     RadarTouchData? radarTouchData,
+    this.minValue,
+    this.maxValue,
     super.borderData,
   })  : assert(dataSets != null && dataSets.hasEqualDataEntriesLength),
         assert(
@@ -93,7 +96,17 @@ class RadarChartData extends BaseChartData with EquatableMixin {
         gridBorderData = gridBorderData ?? const BorderSide(width: 2),
         super(
           touchData: radarTouchData ?? RadarTouchData(),
-        );
+        ) {
+    assert(
+      maxValue == null || maxValue! <= maxEntry.value,
+      'maxValue must be equal or smaller than the maximum value in dataSets',
+    );
+
+    assert(
+      minValue == null || minValue! >= minEntry.value,
+      'minValue must be equal or bigger than the minimum value in dataSets',
+    );
+  }
 
   /// [RadarChart] draw [dataSets] that each of them showing a list of [RadarEntry]
   final List<RadarDataSet> dataSets;
@@ -157,6 +170,12 @@ class RadarChartData extends BaseChartData with EquatableMixin {
   /// [titleCount] we use this value to determine number of [RadarChart] grid or lines.
   int get titleCount => dataSets[0].dataEntries.length;
 
+  ///  Defines the specific minimum value explicitly given
+  final double? minValue;
+
+  /// Defines the specific maximum value explicitly given
+  final double? maxValue;
+
   /// defines the maximum [RadarEntry] value in all [dataSets]
   /// we use this value to calculate the maximum value of ticks.
   RadarEntry get maxEntry {
@@ -199,6 +218,8 @@ class RadarChartData extends BaseChartData with EquatableMixin {
     BorderSide? tickBorderData,
     BorderSide? gridBorderData,
     RadarTouchData? radarTouchData,
+    double? minValue,
+    double? maxValue,
     FlBorderData? borderData,
   }) =>
       RadarChartData(
@@ -216,6 +237,8 @@ class RadarChartData extends BaseChartData with EquatableMixin {
         gridBorderData: gridBorderData ?? this.gridBorderData,
         radarTouchData: radarTouchData ?? this.radarTouchData,
         borderData: borderData ?? this.borderData,
+        minValue: minValue ?? this.minValue,
+        maxValue: maxValue ?? this.maxValue,
       );
 
   /// Lerps a [BaseChartData] based on [t] value, check [Tween.lerp].
@@ -242,6 +265,8 @@ class RadarChartData extends BaseChartData with EquatableMixin {
         tickBorderData: BorderSide.lerp(a.tickBorderData, b.tickBorderData, t),
         borderData: FlBorderData.lerp(a.borderData, b.borderData, t),
         radarTouchData: b.radarTouchData,
+        minValue: lerpDouble(a.minValue, b.minValue, t),
+        maxValue: lerpDouble(a.maxValue, b.maxValue, t),
       );
     } else {
       throw Exception('Illegal State');

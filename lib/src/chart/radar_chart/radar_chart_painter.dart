@@ -74,8 +74,8 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
   }
 
   double getChartCenterValue(RadarChartData data) {
-    final dataSetMaxValue = data.maxEntry.value;
-    final dataSetMinValue = data.minEntry.value;
+    final dataSetMaxValue = data.maxValue ?? data.maxEntry.value;
+    final dataSetMinValue = data.minValue ?? data.minEntry.value;
     final tickSpace = getSpaceBetweenTicks(data);
     final centerValue = dataSetMinValue - tickSpace;
 
@@ -88,7 +88,8 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
   double getScaledPoint(RadarEntry point, double radius, RadarChartData data) {
     final centerValue = getChartCenterValue(data);
     final distanceFromPointToCenter = point.value - centerValue;
-    final distanceFromMaxToCenter = data.maxEntry.value - centerValue;
+    final distanceFromMaxToCenter =
+        (data.maxValue ?? data.maxEntry.value) - centerValue;
 
     if (distanceFromMaxToCenter == 0) {
       return radius * distanceFromPointToCenter / 0.001;
@@ -100,8 +101,8 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
   @visibleForTesting
   double getFirstTickValue(RadarChartData data) {
     final defaultCenterValue = getDefaultChartCenterValue();
-    final dataSetMaxValue = data.maxEntry.value;
-    final dataSetMinValue = data.minEntry.value;
+    final dataSetMaxValue = data.maxValue ?? data.maxEntry.value;
+    final dataSetMinValue = data.minValue ?? data.minEntry.value;
 
     return dataSetMaxValue == dataSetMinValue
         ? (dataSetMaxValue - defaultCenterValue) / (data.tickCount + 1) +
@@ -112,8 +113,8 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
   @visibleForTesting
   double getSpaceBetweenTicks(RadarChartData data) {
     final defaultCenterValue = getDefaultChartCenterValue();
-    final dataSetMaxValue = data.maxEntry.value;
-    final dataSetMinValue = data.minEntry.value;
+    final dataSetMaxValue = data.maxValue ?? data.maxEntry.value;
+    final dataSetMinValue = data.minValue ?? data.minEntry.value;
     final tickSpace = (dataSetMaxValue - dataSetMinValue) / data.tickCount;
     final defaultTickSpace =
         (dataSetMaxValue - defaultCenterValue) / (data.tickCount + 1);
